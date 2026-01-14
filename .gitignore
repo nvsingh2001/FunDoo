@@ -1,0 +1,16 @@
+/.idea/
+
+/BusinessLogicLayer/bin/
+/BusinessLogicLayer/obj/
+
+/FunDooApp/bin/
+/FunDooApp/obj/
+
+/DataLogic/bin/
+/DataLogic/obj/
+
+/ModelLayer/bin/
+/ModelLayer/obj/
+
+/TestingLayer/bin/
+/TestingLayer/obj/
