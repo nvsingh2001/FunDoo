@@ -64,8 +64,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         modelBuilder.Entity<Note>(entity =>
             {
-                entity.HasKey(e => e.NoteId);
-
+                entity.HasKey(e => e.NoteId); 
                 entity.Property(e => e.NoteId)
                     .UseIdentityColumn();
 
@@ -100,7 +99,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
                 entity.HasMany(u => u.Labels)
                     .WithMany(l => l.Notes)
-                    .UsingEntity(j => j.ToTable("NoteLabels"));
+                    .UsingEntity<Dictionary<string, object>>(
+                        "NoteLabels",
+                        l => l.HasOne<Label>().WithMany().HasForeignKey("LabelsLabelId")
+                            .OnDelete(DeleteBehavior.Restrict),
+                        n => n.HasOne<Note>().WithMany().HasForeignKey("NotesNoteId").OnDelete(DeleteBehavior.Cascade)
+                    );
             }
         );
 
