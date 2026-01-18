@@ -140,7 +140,13 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
             );
         }
     }
-
+    
+    /// <summary>
+    /// Update Note 
+    /// </summary>
+    /// <param name="noteId"></param>
+    /// <param name="noteDto"></param>
+    /// <returns></returns>
     [HttpPut("{noteId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<NoteResponseDto>))]
@@ -176,6 +182,11 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
         }
     }
     
+    /// <summary>
+    /// Toggle Archive
+    /// </summary>
+    /// <param name="noteId"></param>
+    /// <returns></returns>
     [HttpPatch("{noteId}/archive")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<NoteResponseDto>))]
@@ -211,6 +222,12 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
         }
     }
 
+    /// <summary>
+    /// Toggle Pin 
+    /// </summary>
+    /// <param name="noteId"></param>
+    /// <param name="pinDto"></param>
+    /// <returns></returns>
     [HttpPatch("{noteId}/pin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<NoteResponseDto>))]

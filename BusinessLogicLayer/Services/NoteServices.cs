@@ -105,7 +105,7 @@ public class NoteServices(INoteRepository noteRepository, IMapper mapper): INote
         if (existingNote is null)
             throw new KeyNotFoundException("Note not found");
         
-        existingNote.IsPin = !existingNote.IsPin;
+        existingNote.IsPin = pinDto.IsPin;
         existingNote.ChangedAt = DateTime.UtcNow;
         
         var result = await noteRepository.UpdateNoteAsync(existingNote);
