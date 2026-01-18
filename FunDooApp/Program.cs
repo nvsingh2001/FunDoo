@@ -16,18 +16,24 @@ builder.Services.AddControllers();
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddSingleton<ITokenService, TokenServices>();
-
 builder.Services.AddDbContext<ApplicationDbContext>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
-    sqlOptions => sqlOptions.CommandTimeout(30))
+        sqlOptions => sqlOptions.CommandTimeout(30))
 );
+
+builder.Services.AddSingleton<ITokenService, TokenServices>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+builder.Services.AddScoped<INoteRepository, NoteRepository>();
+
 builder.Services.AddScoped<IUserService, UserServices>();
 
+builder.Services.AddScoped<INoteService, NoteServices>();
+
 builder.Services.AddAutoMapper(typeof(UserProfile));
+
+builder.Services.AddAutoMapper(typeof(NoteProfile));
 
 builder.Services.AddLogging(config =>
 {
