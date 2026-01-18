@@ -86,4 +86,17 @@ public class NoteRepository(ApplicationDbContext dbContext) : INoteRepository
     {
         return await dbContext.Notes.AnyAsync(n => n.NoteId == noteId && n.UserId == userId);
     }
+
+    public async Task AddLabelToNoteAsync(int noteId, Label label)
+    {
+        var note = await dbContext.Notes
+            .Include(n => n.Labels)
+            .FirstOrDefaultAsync(n => n.NoteId == noteId);
+
+        if (note != null)
+        {
+            note.Labels.Add(label);
+            await dbContext.SaveChangesAsync();
+        }
+    }
 }

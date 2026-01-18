@@ -9,6 +9,7 @@ public interface INoteRepository
     Task<Note?> GetNoteByIdAsync(int noteId, int userId);
     Task<Note> UpdateNoteAsync(Note note);
     Task<bool> DeleteNoteAsync(int noteId, int userId); // Soft delete
-    Task<bool> DeletePermanentlyAsync(int noteId, int userId); // Permanent delete
+    Task<bool> DeletePermanentlyAsync(int noteId, int userId);
     Task<bool> NoteExistsAsync(int noteId, int userId);
+    Task AddLabelToNoteAsync(int noteId, Label label);
 }
