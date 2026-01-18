@@ -247,6 +247,111 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
     }
     
     /// <summary>
+    /// Restore Soft Delete Note
+    /// </summary>
+    /// <param name="noteId"></param>
+    /// <returns></returns>
+    [HttpPatch("{noteId}/restore")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ApiResponse<NoteResponseDto>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<ApiResponse<NoteResponseDto>>> RestoreNoteAsync(int noteId)
+    {
+        try
+        {
+            var userId = GetUserId();
+            var restoredNote = await noteService.RestoreNoteAsync(userId, noteId);
+
+            return Ok(new ApiResponse<NoteResponseDto>(
+                true,
+                "Note restored successfully",
+                restoredNote
+            ));
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogWarning($"Key not found: {ex.Message}");
+            return NotFound(new ApiResponse<NoteResponseDto>(
+                false,
+                ex.Message)
+            );
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Error while restoring note: {ex.Message}");
+            return StatusCode(500, new ApiResponse<NoteResponseDto>(
+                false, 
+                "An error occurred while restoring note")
+            );
+        }
+    }
+    
+    /// <summary>
+    /// Get all the archived notes
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("archive")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<ApiResponse<NoteResponseDto>>> GetArchivedNotes()
+    {
+        return await GetAllNotes(isArchive: true, isTrash: false);
+    }
+    
+    /// <summary>
+    /// Get All the Thrashed Notes
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("trash")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<ApiResponse<NoteResponseDto>>> GetTrashedNotes()
+    {
+        return await GetAllNotes(isArchive: false, isTrash: true);
+    }
+
+    /// <summary>
+    /// Update the Color
+    /// </summary>
+    /// <param name="noteId"></param>
+    /// <param name="color"></param>
+    /// <returns></returns>
+    [HttpPatch("{noteId}/color")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ApiResponse<NoteResponseDto>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<ApiResponse<NoteResponseDto>>> UpdateNoteColorAsync(int noteId, [FromBody] string color)
+    {
+        try
+        {
+            var userId = GetUserId();
+            var updatedNote = await noteService.UpdateColorAsync(userId, noteId, color);
+
+            return Ok(new ApiResponse<NoteResponseDto>(
+                true,
+                "Note color updated successfully",
+                updatedNote
+            ));
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogWarning($"Key not found: {ex.Message}");
+            return NotFound(new ApiResponse<NoteResponseDto>(
+                false,
+                ex.Message)
+            );
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Error while updating note color: {ex.Message}");
+            return StatusCode(500, new ApiResponse<NoteResponseDto>(
+                false, 
+                "An error occurred while updating note color")
+            );
+        }
+    }
+    
+    /// <summary>
     /// Delete Note Soft
     /// </summary>
     /// <param name="noteId"></param>

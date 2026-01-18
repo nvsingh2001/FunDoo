@@ -11,5 +11,9 @@ public class NoteProfile:  Profile
         CreateMap<Note, NoteResponseDto>().ReverseMap();
         
         CreateMap<NoteCreateDto, Note>();
+        
+        CreateMap<Note, NoteDetailsDto>().ReverseMap();
+        
+        CreateMap<NoteUpdateDto, Note>();
     }
 }

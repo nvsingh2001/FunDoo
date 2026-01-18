@@ -14,4 +14,5 @@ public interface INoteService
     Task<NoteResponseDto> RestoreNoteAsync(int userId, int noteId);
     Task<NoteResponseDto> ToggleArchiveAsync(int userId, int noteId);
     Task<NoteResponseDto> TogglePinAsync(int userId, int noteId, NotePinDto pinDto);
+    Task<NoteResponseDto> UpdateColorAsync(int userId, int noteId, string color);
 }

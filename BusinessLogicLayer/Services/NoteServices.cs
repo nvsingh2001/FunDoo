@@ -77,7 +77,7 @@ public class NoteServices(INoteRepository noteRepository, IMapper mapper): INote
         if (!existingNote.IsTrash)
             throw new InvalidOperationException("Note is not trashed");
             
-        existingNote.IsTrash = true;
+        existingNote.IsTrash = false;
         existingNote.ChangedAt = DateTime.UtcNow;
         var result = await noteRepository.UpdateNoteAsync(existingNote);
         
@@ -106,6 +106,20 @@ public class NoteServices(INoteRepository noteRepository, IMapper mapper): INote
             throw new KeyNotFoundException("Note not found");
         
         existingNote.IsPin = !existingNote.IsPin;
+        existingNote.ChangedAt = DateTime.UtcNow;
+        
+        var result = await noteRepository.UpdateNoteAsync(existingNote);
+        return mapper.Map<NoteResponseDto>(result);
+    }
+
+    public async Task<NoteResponseDto> UpdateColorAsync(int userId, int noteId, string color)
+    {
+        var existingNote = await noteRepository.GetNoteByIdAsync(userId, noteId);
+        
+        if (existingNote is null)
+            throw new KeyNotFoundException("Note not found");
+            
+        existingNote.Colour = color;
         existingNote.ChangedAt = DateTime.UtcNow;
         
         var result = await noteRepository.UpdateNoteAsync(existingNote);

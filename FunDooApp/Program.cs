@@ -27,13 +27,19 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<INoteRepository, NoteRepository>();
 
+builder.Services.AddScoped<ILabelRepository, LabelRepository>();
+
 builder.Services.AddScoped<IUserService, UserServices>();
 
 builder.Services.AddScoped<INoteService, NoteServices>();
 
+builder.Services.AddScoped<ILabelService, LabelServices>();
+
 builder.Services.AddAutoMapper(typeof(UserProfile));
 
 builder.Services.AddAutoMapper(typeof(NoteProfile));
+
+builder.Services.AddAutoMapper(typeof(LabelProfile));
 
 builder.Services.AddLogging(config =>
 {
