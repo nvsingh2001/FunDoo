@@ -41,4 +41,11 @@ public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
 
         return await query.AnyAsync();
     }
+
+    public async Task<User> UpdateUserAsync(User user)
+    {
+        var query = dbContext.Users.Update(user);
+        await dbContext.SaveChangesAsync();
+        return query.Entity;
+    }
 }

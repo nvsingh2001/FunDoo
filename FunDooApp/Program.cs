@@ -23,6 +23,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddSingleton<ITokenService, TokenServices>();
 
+builder.Services.AddTransient<IEmailService, EmailServices>();
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<INoteRepository, NoteRepository>();

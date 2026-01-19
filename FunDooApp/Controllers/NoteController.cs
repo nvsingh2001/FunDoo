@@ -14,7 +14,7 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
 {
     private int GetUserId()
     {
-        var value = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var value = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(value))
         {
             throw new UnauthorizedAccessException("User ID not found in claims.");

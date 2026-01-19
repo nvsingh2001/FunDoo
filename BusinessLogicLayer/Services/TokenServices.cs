@@ -47,4 +47,26 @@ public class TokenServices: ITokenService
         
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    public string GenerateResetToken(User user)
+    {
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim("Purpose", "PasswordReset")
+        };
+
+        var token = new JwtSecurityToken(
+            issuer: _configuration["Jwt:Issuer"],
+            audience: _configuration["Jwt:Audience"],
+            claims: claims,
+            expires: DateTime.Now.AddMinutes(15),
+            signingCredentials: new SigningCredentials(
+                _privateKey,
+                SecurityAlgorithms.RsaSha256
+            )
+        );
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
 }

@@ -1,4 +1,5 @@
 using BusinessLogicLayer.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ModelLayer.DTOs;
 using ModelLayer.Utilities;
@@ -102,6 +103,101 @@ public class UserController(IUserService userService, ILogger<UserController> lo
             return StatusCode(500, new ApiResponse<UserResponseDto>(
                     false,
                     ex.Message
+                )
+            );
+        }
+    }
+    
+    /// <summary>
+    /// Request Password Reset Link
+    /// </summary>
+    [HttpPost("forgot-password")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<string>))]
+    public async Task<ActionResult<ApiResponse<string>>> ForgotPassword([FromQuery] string email)
+    {
+        if (string.IsNullOrEmpty(email))
+            return BadRequest(new ApiResponse<string>(
+                    false,
+                    "Email is required"
+                )
+            );
+
+        try
+        {
+            await userService.ForgotPassword(email);
+            return Ok(new ApiResponse<string>(
+                    true,
+                    "Password reset link sent to your email"
+                )
+            );
+        }
+        catch (InvalidOperationException ex)
+        {
+            logger.LogWarning($"Forgot Password failed: {ex.Message}");
+            return NotFound(new ApiResponse<string>(
+                    false,
+                    ex.Message
+                )
+            );
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Error in ForgotPassword: {ex.Message}");
+            return StatusCode(500, new ApiResponse<string>(
+                    false,
+                    "An error occurred"
+                )
+            );
+        }
+    }
+
+    /// <summary>
+    /// Reset Password using Token
+    /// </summary>
+    [HttpPost("reset-password")]
+    [Authorize] 
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ApiResponse<string>>> ResetPassword([FromBody] string newPassword)
+    {
+        var purposeClaim = User.Claims.FirstOrDefault(c => c.Type == "Purpose")?.Value;
+        if (purposeClaim != "PasswordReset")
+        {
+            return StatusCode(403, new ApiResponse<string>(
+                    false,
+                    "Invalid token type. This token cannot be used for password reset."
+                )
+            );
+        }
+
+        var userIdClaim = User.Claims.FirstOrDefault(c => System.Security.Claims.ClaimTypes.NameIdentifier == c.Type)?.Value;
+        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+        {
+            return Unauthorized(new ApiResponse<string>(
+                    false,
+                    "Invalid Token: User ID missing"
+                )
+            );
+        }
+
+        try
+        {
+            await userService.ResetPassword(userId, newPassword);
+            return Ok(new ApiResponse<string>(
+                    true,
+                    "Password has been reset successfully"
+                )
+            );
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Error in ResetPassword: {ex.Message}");
+            return StatusCode(500, new ApiResponse<string>(
+                    false,
+                    "An error occurred while resetting password"
                 )
             );
         }
