@@ -29,17 +29,23 @@ builder.Services.AddScoped<INoteRepository, NoteRepository>();
 
 builder.Services.AddScoped<ILabelRepository, LabelRepository>();
 
+builder.Services.AddScoped<ICollaboratorRepository, CollaboratorRepository>();
+
 builder.Services.AddScoped<IUserService, UserServices>();
 
 builder.Services.AddScoped<INoteService, NoteServices>();
 
 builder.Services.AddScoped<ILabelService, LabelServices>();
 
+builder.Services.AddScoped<ICollaboratorService, CollaboratorServices>();
+
 builder.Services.AddAutoMapper(typeof(UserProfile));
 
 builder.Services.AddAutoMapper(typeof(NoteProfile));
 
 builder.Services.AddAutoMapper(typeof(LabelProfile));
+
+builder.Services.AddAutoMapper(typeof(CollaboratorProfile));
 
 builder.Services.AddLogging(config =>
 {

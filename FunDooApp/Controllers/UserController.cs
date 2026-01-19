@@ -6,7 +6,7 @@ using ModelLayer.Utilities;
 namespace FunDooApp.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/user")]
 public class UserController(IUserService userService, ILogger<UserController> logger): ControllerBase
 {
     /// <summary>
