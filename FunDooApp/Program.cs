@@ -1,3 +1,4 @@
+using BusinessLogicLayer.Consumers;
 using BusinessLogicLayer.Interfaces;
 using BusinessLogicLayer.Mapping;
 using BusinessLogicLayer.Services;
@@ -6,6 +7,7 @@ using DataLogic.Interfaces;
 using DataLogic.Repositories;
 using FunDooApp.Extensions;
 using FunDooApp.Middleware;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 
@@ -21,6 +23,25 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
         sqlOptions => sqlOptions.CommandTimeout(30))
 );
+
+builder.Services.AddMassTransit(config =>
+{
+    config.AddConsumer<EmailConsumer>();
+
+    config.UsingRabbitMq((ctx, cfg) =>
+    {
+        cfg.Host("localhost", "/", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+
+        cfg.ReceiveEndpoint("email-queue", e =>
+        {
+            e.ConfigureConsumer<EmailConsumer>(ctx);
+        });
+    });
+});
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {

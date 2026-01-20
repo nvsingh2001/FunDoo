@@ -1,13 +1,21 @@
 using AutoMapper;
 using BusinessLogicLayer.Interfaces;
 using DataLogic.Interfaces;
+using MassTransit;
 using ModelLayer.DTOs;
 using ModelLayer.Entities;
+using ModelLayer.Event;
 using static BCrypt.Net.BCrypt;
 
 namespace BusinessLogicLayer.Services;
 
-public class UserServices(IUserRepository userRepository, IMapper mapper,  ITokenService tokenService, IEmailService emailService): IUserService
+public class UserServices(
+    IUserRepository userRepository, 
+    IMapper mapper,  
+    ITokenService tokenService, 
+    IEmailService emailService,
+    IPublishEndpoint publishEndpoint
+    ): IUserService
 {
     public async Task<UserResponseDto> RegisterUserAsync(UserRequestDto userDto)
     {
@@ -30,7 +38,15 @@ public class UserServices(IUserRepository userRepository, IMapper mapper,  IToke
         
         var result = await userRepository.CreateUserAsync(user);
         
-        await  emailService.SendEmailAsync(user.Email, "FunDoo App", message);
+        // await  emailService.SendEmailAsync(user.Email, "FunDoo App", message);
+
+        await publishEndpoint.Publish<ISendEmailEvent>(new
+            {
+                ToEmail = user.Email,
+                Subject = "Welcome to FunDoo App",
+                Body = message
+            }
+        );
         
         return mapper.Map<UserResponseDto>(result);
     }
