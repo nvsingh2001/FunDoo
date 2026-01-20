@@ -88,7 +88,7 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<NoteResponseDto>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<ApiResponse<NoteResponseDto>>> GetAllNotes(bool? isArchive=false, bool? isTrash=false )
+    public async Task<ActionResult<ApiResponse<IEnumerable<NoteResponseDto>>>> GetAllNotes(bool? isArchive=false, bool? isTrash=false )
     {
         var userId = GetUserId();
         var notes = await noteService.GetAllNotesAsync(userId, isArchive, isTrash);
@@ -310,7 +310,7 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
     [HttpGet("archive")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<ApiResponse<NoteResponseDto>>> GetArchivedNotes()
+    public async Task<ActionResult<ApiResponse<IEnumerable<NoteResponseDto>>>> GetArchivedNotes()
     {
         return await GetAllNotes(isArchive: true, isTrash: false);
     }
@@ -322,7 +322,7 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
     [HttpGet("trash")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<ApiResponse<NoteResponseDto>>> GetTrashedNotes()
+    public async Task<ActionResult<ApiResponse<IEnumerable<NoteResponseDto>>>> GetTrashedNotes()
     {
         return await GetAllNotes(isArchive: false, isTrash: true);
     }
