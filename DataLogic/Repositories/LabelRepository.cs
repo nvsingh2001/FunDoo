@@ -32,6 +32,7 @@ public class LabelRepository(ApplicationDbContext dbContext): ILabelRepository
                 .ThenInclude(n => n.Labels)
             .Include(l => l.Notes)
                 .ThenInclude(n => n.Collaborators)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(l => l.LabelId == labelId && l.UserId == userId);
         
         return label?.Notes ?? Enumerable.Empty<Note>();

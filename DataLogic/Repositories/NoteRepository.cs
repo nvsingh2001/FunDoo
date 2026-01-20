@@ -17,7 +17,7 @@ public class NoteRepository(ApplicationDbContext dbContext) : INoteRepository
     public async Task<IEnumerable<Note>> GetAllNotesAsync(int userId, bool? isArchived = null, bool? isTrash = null)
     {
         var query = dbContext.Notes.AsQueryable()
-            .Where(n => n.UserId == userId);
+            .Where(n => n.UserId == userId || n.Collaborators.Any(c => c.UserId == userId));
 
         if (isArchived.HasValue)
             query = query.Where(n => n.IsArchive == isArchived.Value);
@@ -28,6 +28,7 @@ public class NoteRepository(ApplicationDbContext dbContext) : INoteRepository
         return await query
             .Include(n => n.Labels)
             .Include(n => n.Collaborators)
+            .AsSplitQuery() 
             .OrderByDescending(n => n.CreatedAt)
             .ToListAsync();
     }
@@ -37,7 +38,8 @@ public class NoteRepository(ApplicationDbContext dbContext) : INoteRepository
         return await dbContext.Notes
             .Include(n => n.Labels)
             .Include(n => n.Collaborators)
-            .FirstOrDefaultAsync(n => n.NoteId == noteId && n.UserId == userId);
+            .AsSplitQuery() 
+            .FirstOrDefaultAsync(n => n.NoteId == noteId && (n.UserId == userId || n.Collaborators.Any(c => c.UserId == userId)));
     }
 
     public async Task<Note> UpdateNoteAsync(Note note)
@@ -84,7 +86,7 @@ public class NoteRepository(ApplicationDbContext dbContext) : INoteRepository
 
     public async Task<bool> NoteExistsAsync(int noteId, int userId)
     {
-        return await dbContext.Notes.AnyAsync(n => n.NoteId == noteId && n.UserId == userId);
+        return await dbContext.Notes.AnyAsync(n => n.NoteId == noteId && (n.UserId == userId || n.Collaborators.Any(c => c.UserId == userId)));
     }
 
     public async Task AddLabelToNoteAsync(int noteId, Label label)

@@ -28,9 +28,9 @@ public class UserServices(IUserRepository userRepository, IMapper mapper,  IToke
 
         var message = $"Hello {user.FirstName}!\nWelcome to FunDoo App!";
         
-        await  emailService.SendEmailAsync(user.Email, "FunDoo App", message);
-        
         var result = await userRepository.CreateUserAsync(user);
+        
+        await  emailService.SendEmailAsync(user.Email, "FunDoo App", message);
         
         return mapper.Map<UserResponseDto>(result);
     }

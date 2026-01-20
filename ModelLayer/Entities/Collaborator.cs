@@ -17,4 +17,6 @@ public class Collaborator
     
     public int NoteId { get; set; }
     public Note Note { get; set; }
+
+    public DateTime AddedAt { get; set; } = DateTime.UtcNow;
 }

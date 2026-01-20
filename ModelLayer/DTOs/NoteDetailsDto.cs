@@ -12,7 +12,7 @@ public class NoteDetailsDto
     public bool IsPin { get; set; }
     public bool IsArchive { get; set; }
     public bool IsTrash { get; set; }
-    public DateTime? UpdatedAt { get; set; }
+    public DateTime? ChangedAt { get; set; }
     
     public ICollection<LabelResponseDto> Labels { get; set; }
     public ICollection<CollaboratorResponseDto> Collaborators { get; set; }

@@ -7,6 +7,7 @@ using DataLogic.Repositories;
 using FunDooApp.Extensions;
 using FunDooApp.Middleware;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
         sqlOptions => sqlOptions.CommandTimeout(30))
 );
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = "localhost";
+    options.InstanceName = "FunDoo_";
+    options.ConfigurationOptions = new ConfigurationOptions()
+    {
+        AbortOnConnectFail = false,
+        EndPoints = { options.Configuration }
+    };
+});
 
 builder.Services.AddSingleton<ITokenService, TokenServices>();
 
@@ -36,7 +48,6 @@ builder.Services.AddScoped<ICollaboratorRepository, CollaboratorRepository>();
 builder.Services.AddScoped<IUserService, UserServices>();
 
 builder.Services.AddScoped<INoteService, NoteServices>();
-
 builder.Services.AddScoped<ILabelService, LabelServices>();
 
 builder.Services.AddScoped<ICollaboratorService, CollaboratorServices>();
@@ -76,11 +87,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
-
 app.Run();
