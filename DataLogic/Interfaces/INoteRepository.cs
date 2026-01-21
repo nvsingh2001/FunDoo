@@ -12,4 +12,5 @@ public interface INoteRepository
     Task<bool> DeletePermanentlyAsync(int noteId, int userId);
     Task<bool> NoteExistsAsync(int noteId, int userId);
     Task AddLabelToNoteAsync(int noteId, Label label);
+    Task<IEnumerable<Note>> GetNotesWithDueRemindersAsync();
 }

@@ -88,7 +88,7 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<NoteResponseDto>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<ApiResponse<IEnumerable<NoteResponseDto>>>> GetAllNotes(bool? isArchive=false, bool? isTrash=false )
+    public async Task<ActionResult<ApiResponse<IEnumerable<NoteResponseDto>>>> GetAllNotes([FromQuery]bool? isArchive=false, [FromQuery]bool? isTrash=false )
     {
         var userId = GetUserId();
         var notes = await noteService.GetAllNotesAsync(userId, isArchive, isTrash);

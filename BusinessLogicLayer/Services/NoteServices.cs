@@ -2,13 +2,20 @@ using AutoMapper;
 using BusinessLogicLayer.Extensions;
 using BusinessLogicLayer.Interfaces;
 using DataLogic.Interfaces;
+using MassTransit;
 using Microsoft.Extensions.Caching.Distributed;
 using ModelLayer.DTOs;
 using ModelLayer.Entities;
+using ModelLayer.Event;
 
 namespace BusinessLogicLayer.Services;
 
-public class NoteServices(INoteRepository noteRepository, IMapper mapper, IDistributedCache distributedCache): INoteService
+public class NoteServices(
+    INoteRepository noteRepository, 
+    IMapper mapper, 
+    IDistributedCache distributedCache,
+    IPublishEndpoint publishEndpoint
+    ): INoteService
 {
     private async Task ClearNoteCacheAsync(int userId, int? noteId, IEnumerable<int>? labelIds = null)
     {
@@ -183,5 +190,23 @@ public class NoteServices(INoteRepository noteRepository, IMapper mapper, IDistr
         await ClearNoteCacheAsync(userId, noteId, existingNote.Labels?.Select(l => l.LabelId));
         
         return mapper.Map<NoteResponseDto>(result);
+    }
+    public async Task ProcessDueRemindersAsync()
+    {
+        var dueNotes = await noteRepository.GetNotesWithDueRemindersAsync();
+        
+        foreach (var note in dueNotes)
+        {
+            await publishEndpoint.Publish<ISendReminderEvent>(new
+            {
+                ToEmail = note.User.Email,
+                NoteTitle = note.Title,
+                NoteDescription = note.Description,
+            });
+
+            note.Reminder = null;
+            
+            await noteRepository.UpdateNoteAsync(note);
+        }
     }
 }

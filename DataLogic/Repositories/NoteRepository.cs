@@ -45,7 +45,7 @@ public class NoteRepository(ApplicationDbContext dbContext) : INoteRepository
     public async Task<Note> UpdateNoteAsync(Note note)
     {
         var existingNote = await dbContext.Notes.FirstOrDefaultAsync(n => n.NoteId == note.NoteId && n.UserId == note.UserId);
-        if (existingNote == null) return null;
+        if (existingNote == null) return null!;
 
         existingNote.Title = note.Title;
         existingNote.Description = note.Description;
@@ -101,4 +101,13 @@ public class NoteRepository(ApplicationDbContext dbContext) : INoteRepository
             await dbContext.SaveChangesAsync();
         }
     }
+
+    public async Task<IEnumerable<Note>> GetNotesWithDueRemindersAsync()
+    {
+        return await dbContext.Notes
+            .Include(n => n.User)
+            .Where(n => n.Reminder != null && n.Reminder <= DateTime.UtcNow)
+            .ToListAsync();
+    }
+
 }

@@ -5,28 +5,27 @@ namespace FunDooApp.Extensions;
 
 public static class JwtExtension
 {
-    public static void AddJwtAuthentication(this WebApplicationBuilder builder)
+    public static void AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         var rsa = System.Security.Cryptography.RSA.Create();
-        rsa.ImportFromPem(File.ReadAllText(builder.Configuration["Jwt:PublicKeyPath"]!));
+        rsa.ImportFromPem(File.ReadAllText(configuration["Jwt:PublicKeyPath"]!));
 
         var publicKey = new RsaSecurityKey(rsa);
 
-        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
 
-                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                        ValidAudience = builder.Configuration["Jwt:Audience"],
-                        IssuerSigningKey = publicKey
-                    };
-                }
-            );
+                    ValidIssuer = configuration["Jwt:Issuer"],
+                    ValidAudience = configuration["Jwt:Audience"],
+                    IssuerSigningKey = publicKey
+                };
+            }
+        );
     }
 }

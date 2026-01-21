@@ -13,7 +13,6 @@ public class UserServices(
     IUserRepository userRepository, 
     IMapper mapper,  
     ITokenService tokenService, 
-    IEmailService emailService,
     IPublishEndpoint publishEndpoint
     ): IUserService
 {
@@ -26,8 +25,7 @@ public class UserServices(
         
         var hashedPassword = EnhancedHashPassword(userDto.Password);
 
-        var user = new User()
-        {
+        var user = new User() {
             FirstName = userDto.FirstName,
             LastName = userDto.LastName,
             Email = userDto.Email,
@@ -37,8 +35,6 @@ public class UserServices(
         var message = $"Hello {user.FirstName}!\nWelcome to FunDoo App!";
         
         var result = await userRepository.CreateUserAsync(user);
-        
-        // await  emailService.SendEmailAsync(user.Email, "FunDoo App", message);
 
         await publishEndpoint.Publish<ISendEmailEvent>(new
             {
@@ -91,7 +87,13 @@ public class UserServices(
 
         var message = $"Click here to reset: http://localhost:7196/reset-password?token={jwtToken}";
         
-        await emailService.SendEmailAsync(email, "Reset Password", message);
+        await publishEndpoint.Publish<ISendEmailEvent>(new
+            {
+                ToEmail = user.Email,
+                Subject = "Reset Password",
+                Body = message
+            }
+        );
     }
 
     public async Task ResetPassword(int userId, string newPassword)
@@ -102,6 +104,7 @@ public class UserServices(
             throw new InvalidOperationException($"User with id:{userId} does not exist");
         
         var hashedPassword = EnhancedHashPassword(newPassword);
+        
         user.Password = hashedPassword;
         
         await userRepository.UpdateUserAsync(user);
