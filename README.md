@@ -70,7 +70,7 @@ Ensure the following services are installed and running locally or via Docker:
 *   [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 *   [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads)
 *   [Redis](https://redis.io/download/) (Default port: `6379`)
-*   [RabbitMQ](https://www.rabbitmq.com/download.html) (Default Guest/Guest access)
+*   [RabbitMQ](https://www.rabbitmq.com/download.html) 
 
 ## ⚙️ Setup & Configuration
 
