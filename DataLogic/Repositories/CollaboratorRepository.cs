@@ -16,7 +16,6 @@ public class CollaboratorRepository(ApplicationDbContext dbContext) : ICollabora
 
     public async Task<IEnumerable<Collaborator>> GetCollaboratorsByNoteIdAsync(int noteId, int userId)
     {
-        // Ensure the note belongs to the user before showing collaborators
         var noteExists = await dbContext.Notes.AnyAsync(n => n.NoteId == noteId && n.UserId == userId);
         if (!noteExists) return Enumerable.Empty<Collaborator>();
 
@@ -27,7 +26,6 @@ public class CollaboratorRepository(ApplicationDbContext dbContext) : ICollabora
 
     public async Task<bool> RemoveCollaboratorAsync(int collaboratorId, int userId)
     {
-        // Find collaborator AND verify that the note it belongs to is owned by the user
         var collaborator = await dbContext.Collaborators
             .Include(c => c.Note)
             .FirstOrDefaultAsync(c => c.CollaboratorId == collaboratorId && c.Note.UserId == userId);
