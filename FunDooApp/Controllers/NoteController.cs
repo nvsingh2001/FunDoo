@@ -15,11 +15,9 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
     private int GetUserId()
     {
         var value = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(value))
-        {
-            throw new UnauthorizedAccessException("User ID not found in claims.");
-        }
-        return int.Parse(value);
+        return string.IsNullOrEmpty(value) ? 
+            throw new UnauthorizedAccessException("User ID not found in claims.") : 
+            int.Parse(value);
     }
 
 
@@ -63,14 +61,14 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
         }
         catch (InvalidOperationException ex)
         {
-            logger.LogWarning($"Conflict while creating Note: {ex.Message}");
+            logger.LogWarning(ex,"Conflict while creating Note: {ExMessage}", ex.Message);
             return Conflict(new ApiResponse<NoteResponseDto>(
                 false,
                 ex.Message));
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error creating note: {ex.Message}");
+            logger.LogError(ex,"Error creating note: {ExMessage}", ex.Message);
             return StatusCode(500, new ApiResponse<NoteResponseDto>(
                 false, 
                 "An error occurred while creating Note")
@@ -125,7 +123,7 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
         }
         catch (KeyNotFoundException ex)
         {
-            logger.LogWarning($"Key not found: {ex.Message}");
+            logger.LogWarning(ex, "Key not found: {ExMessage}", ex.Message);
             return NotFound(new ApiResponse<NoteResponseDto>(
                 false,
                 ex.Message)
@@ -133,7 +131,7 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error while retrieving note: {ex.Message}");
+            logger.LogError(ex, "Error while retrieving note: {ExMessage}", ex.Message);
             return StatusCode(500, new ApiResponse<NoteDetailsDto>(
                 false, 
                 "An error occurred while retrieving note")
@@ -166,7 +164,7 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
         }
         catch (KeyNotFoundException ex)
         {
-            logger.LogWarning($"Key not found: {ex.Message}");
+            logger.LogWarning(ex, "Key not found: {ExMessage}", ex.Message);
             return NotFound(new ApiResponse<NoteDetailsDto>(
                 false,
                 ex.Message)
@@ -174,7 +172,7 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error while updating note: {ex.Message}");
+            logger.LogError(ex,"Error while updating note: {ExMessage}", ex.Message);
             return StatusCode(500, new ApiResponse<NoteDetailsDto>(
                 false, 
                 "An error occurred while updating note")
@@ -214,7 +212,7 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error while archiving note: {ex.Message}");
+            logger.LogError(ex,$"Error while archiving note: {ex.Message}");
             return StatusCode(500, new ApiResponse<NoteResponseDto>(
                 false, 
                 "An error occurred while updating archive status")
@@ -247,7 +245,7 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
         }
         catch (KeyNotFoundException ex)
         {
-            logger.LogWarning($"Key not found: {ex.Message}");
+            logger.LogWarning(ex, $"Key not found: {ex.Message}");
             return NotFound(new ApiResponse<NoteResponseDto>(
                 false,
                 ex.Message)
@@ -287,7 +285,7 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
         }
         catch (KeyNotFoundException ex)
         {
-            logger.LogWarning($"Key not found: {ex.Message}");
+            logger.LogWarning(ex, $"Key not found: {ex.Message}");
             return NotFound(new ApiResponse<NoteResponseDto>(
                 false,
                 ex.Message)
@@ -295,7 +293,7 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error while restoring note: {ex.Message}");
+            logger.LogError(ex, $"Error while restoring note: {ex.Message}");
             return StatusCode(500, new ApiResponse<NoteResponseDto>(
                 false, 
                 "An error occurred while restoring note")
@@ -352,7 +350,7 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
         }
         catch (KeyNotFoundException ex)
         {
-            logger.LogWarning($"Key not found: {ex.Message}");
+            logger.LogWarning(ex, $"Key not found: {ex.Message}");
             return NotFound(new ApiResponse<NoteResponseDto>(
                 false,
                 ex.Message)
@@ -360,7 +358,7 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error while updating note color: {ex.Message}");
+            logger.LogError(ex, $"Error while updating note color: {ex.Message}");
             return StatusCode(500, new ApiResponse<NoteResponseDto>(
                 false, 
                 "An error occurred while updating note color")
@@ -396,7 +394,7 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error while deleting note: {ex.Message}");
+            logger.LogError(ex,$"Error while deleting note: {ex.Message}");
             return StatusCode(500, new ApiResponse<NoteResponseDto>(
                 false, 
                 "An error occurred while deleting note")
@@ -425,7 +423,7 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
         }
         catch (KeyNotFoundException ex)
         {
-            logger.LogWarning($"Key not found: {ex.Message}");
+            logger.LogWarning(ex, $"Key not found: {ex.Message}");
             return NotFound(new ApiResponse<NoteResponseDto>(
                 false,
                 ex.Message)
@@ -433,7 +431,7 @@ public class NoteController(INoteService noteService, ILogger<NoteController> lo
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error while deleting note: {ex.Message}");
+            logger.LogError(ex, $"Error while deleting note: {ex.Message}");
             return StatusCode(500, new ApiResponse<NoteResponseDto>(
                 false, 
                 "An error occurred while deleting note")

@@ -10,16 +10,17 @@ namespace FunDooApp.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/notes/{noteId}/collaborators")]
-public class CollaboratorController(ICollaboratorService collaboratorService, ILogger<CollaboratorController> logger) : ControllerBase
+public class CollaboratorController(
+    ICollaboratorService collaboratorService, 
+    ILogger<CollaboratorController> logger
+    ) : ControllerBase
 {
     private int GetUserId()
     {
-        var value = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(value))
-        {
-            throw new UnauthorizedAccessException("User ID not found in claims.");
-        }
-        return int.Parse(value);
+        var value = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        return string.IsNullOrEmpty(value) ? 
+            throw new UnauthorizedAccessException("User ID not found in claims.") : 
+            int.Parse(value);
     }
 
     /// <summary>
@@ -27,8 +28,10 @@ public class CollaboratorController(ICollaboratorService collaboratorService, IL
     /// </summary>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<CollaboratorResponseDto>))]
-    public async Task<ActionResult<ApiResponse<CollaboratorResponseDto>>> AddCollaboratorAsync(int noteId, [FromBody] CollaboratorRequestDto collaboratorDto)
+    [ProducesResponseType(StatusCodes.Status400BadRequest, 
+        Type = typeof(ApiResponse<CollaboratorResponseDto>))]
+    public async Task<ActionResult<ApiResponse<CollaboratorResponseDto>>> 
+        AddCollaboratorAsync(int noteId, [FromBody] CollaboratorRequestDto collaboratorDto)
     {
         if (!ModelState.IsValid)
         {
@@ -56,12 +59,12 @@ public class CollaboratorController(ICollaboratorService collaboratorService, IL
         }
         catch (InvalidOperationException ex)
         {
-            logger.LogWarning($"Invalid operation: {ex.Message}");
+            logger.LogWarning(ex, "Invalid operation: {ExMessage}", ex.Message);
             return BadRequest(new ApiResponse<CollaboratorResponseDto>(false, ex.Message));
         }
         catch (KeyNotFoundException ex)
         {
-            logger.LogWarning($"Key not found: {ex.Message}");
+            logger.LogWarning(ex,"Key not found: {ExMessage}", ex.Message);
             return NotFound(new ApiResponse<CollaboratorResponseDto>(
                     false,
                     ex.Message
@@ -70,7 +73,7 @@ public class CollaboratorController(ICollaboratorService collaboratorService, IL
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error adding collaborator: {ex.Message}");
+            logger.LogError(ex, "Error adding collaborator: {ExMessage}", ex.Message);
             return StatusCode(500, new ApiResponse<CollaboratorResponseDto>(
                     false,
                     "An error occurred while adding collaborator"
@@ -95,11 +98,12 @@ public class CollaboratorController(ICollaboratorService collaboratorService, IL
         }
         catch (KeyNotFoundException ex)
         {
+            logger.LogError(ex,"Key not found: {ExMessage}", ex.Message);
             return NotFound(new ApiResponse<IEnumerable<CollaboratorResponseDto>>(false, ex.Message));
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error retrieving collaborators: {ex.Message}");
+            logger.LogError(ex,"Error retrieving collaborators: {ExMessage}", ex.Message);
             return StatusCode(500, new ApiResponse<IEnumerable<CollaboratorResponseDto>>(
                     false,
                     "An error occurred while retrieving collaborators"
@@ -111,7 +115,7 @@ public class CollaboratorController(ICollaboratorService collaboratorService, IL
     /// <summary>
     /// Remove a collaborator from a note
     /// </summary>
-    [HttpDelete("{collaboratorId}")]
+    [HttpDelete("{collaboratorId:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<string>>> RemoveCollaboratorAsync(int noteId, int collaboratorId)
@@ -125,11 +129,12 @@ public class CollaboratorController(ICollaboratorService collaboratorService, IL
         }
         catch (KeyNotFoundException ex)
         {
+            logger.LogError(ex,"Key not found: {ExMessage}", ex.Message);
             return NotFound(new ApiResponse<string>(false, ex.Message));
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error removing collaborator: {ex.Message}");
+            logger.LogError(ex, "Error removing collaborator: {ExMessage}", ex.Message);
             return StatusCode(500, new ApiResponse<string>(
                     false,
                     "An error occurred while removing collaborator"
