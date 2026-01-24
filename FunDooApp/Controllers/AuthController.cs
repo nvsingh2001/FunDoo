@@ -42,7 +42,7 @@ public class AuthController(IUserService userService, ILogger<AuthController> lo
         }
         catch (InvalidOperationException ex)
         {
-            logger.LogWarning($"Error while logging in {ex.Message}");
+            logger.LogWarning(ex,"Error while logging in {ExMessage}", ex.Message);
             return Unauthorized(new ApiResponse<LoginResponseDto>(
                     false,
                     ex.Message
@@ -51,7 +51,7 @@ public class AuthController(IUserService userService, ILogger<AuthController> lo
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error creating user: {ex.Message}");
+            logger.LogError(ex,"Error creating user: {ExMessage}", ex.Message);
             return StatusCode(500, new ApiResponse<LoginResponseDto>(
                 false, 
                 "An error occurred while logging in")

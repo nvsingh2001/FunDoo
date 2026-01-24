@@ -51,14 +51,14 @@ public class UserController(IUserService userService, ILogger<UserController> lo
         }
         catch (InvalidOperationException ex)
         {
-            logger.LogWarning($"Conflict while creating user: {ex.Message}");
+            logger.LogWarning(ex,"Conflict while creating user: {ExMessage}", ex.Message);
             return Conflict(new ApiResponse<UserResponseDto>(
                 false, 
                 ex.Message));
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error creating user: {ex.Message}");
+            logger.LogError(ex,"Error creating user: {ExMessage}", ex.Message);
             return StatusCode(500, new ApiResponse<UserResponseDto>(
                 false, 
                 "An error occurred while creating user")
@@ -67,7 +67,7 @@ public class UserController(IUserService userService, ILogger<UserController> lo
     }
 
     /// <summary>
-    /// Get User By Id
+    /// Get User By ID
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
@@ -90,7 +90,7 @@ public class UserController(IUserService userService, ILogger<UserController> lo
         }
         catch (KeyNotFoundException ex)
         {
-            logger.LogWarning($"Key not found: {ex.Message}");
+            logger.LogWarning(ex,"Key not found: {ExMessage}", ex.Message);
             return NotFound(new ApiResponse<UserResponseDto>(
                     false,
                     ex.Message
@@ -99,7 +99,7 @@ public class UserController(IUserService userService, ILogger<UserController> lo
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error retrieving user: {ex.Message}");
+            logger.LogError(ex,"Error retrieving user: {ExMessage}", ex.Message);
             return StatusCode(500, new ApiResponse<UserResponseDto>(
                     false,
                     ex.Message
@@ -134,7 +134,7 @@ public class UserController(IUserService userService, ILogger<UserController> lo
         }
         catch (InvalidOperationException ex)
         {
-            logger.LogWarning($"Forgot Password failed: {ex.Message}");
+            logger.LogWarning(ex,"Forgot Password failed: {ExMessage}", ex.Message);
             return NotFound(new ApiResponse<string>(
                     false,
                     ex.Message
@@ -143,7 +143,7 @@ public class UserController(IUserService userService, ILogger<UserController> lo
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error in ForgotPassword: {ex.Message}");
+            logger.LogError(ex,"Error in ForgotPassword: {ExMessage}", ex.Message);
             return StatusCode(500, new ApiResponse<string>(
                     false,
                     "An error occurred"
@@ -194,7 +194,7 @@ public class UserController(IUserService userService, ILogger<UserController> lo
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error in ResetPassword: {ex.Message}");
+            logger.LogError(ex,"Error in ResetPassword: {ExMessage}", ex.Message);
             return StatusCode(500, new ApiResponse<string>(
                     false,
                     "An error occurred while resetting password"

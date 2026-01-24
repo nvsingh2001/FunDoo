@@ -14,12 +14,10 @@ public class LabelController(ILabelService labelService, ILogger<LabelController
 {
     private int GetUserId()
     {
-        var value = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(value))
-        {
-            throw new UnauthorizedAccessException("User ID not found in claims.");
-        }
-        return int.Parse(value);
+        var value = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        return string.IsNullOrEmpty(value) ? 
+            throw new UnauthorizedAccessException("User ID not found in claims.") : 
+            int.Parse(value);
     }
 
     /// <summary>
@@ -45,7 +43,7 @@ public class LabelController(ILabelService labelService, ILogger<LabelController
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error creating label: {ex.Message}");
+            logger.LogError(ex,"Error creating label: {ExMessage}", ex.Message);
             return StatusCode(500, new ApiResponse<LabelResponseDto>(false, "An error occurred while creating Label"));
         }
     }
@@ -80,11 +78,12 @@ public class LabelController(ILabelService labelService, ILogger<LabelController
         }
         catch (KeyNotFoundException ex)
         {
+            logger.LogError(ex,"label not found: {ExMessage}", ex.Message);
             return NotFound(new ApiResponse<IEnumerable<NoteResponseDto>>(false, ex.Message));
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error retrieving notes for label: {ex.Message}");
+            logger.LogError(ex,"Error retrieving notes for label: {ExMessage}", ex.Message);
             return StatusCode(500, new ApiResponse<IEnumerable<NoteResponseDto>>(false, "An error occurred while retrieving notes"));
         }
     }
@@ -106,11 +105,12 @@ public class LabelController(ILabelService labelService, ILogger<LabelController
         }
         catch (KeyNotFoundException ex)
         {
+            logger.LogError(ex,"Label not found: {ExMessage}", ex.Message);
             return NotFound(new ApiResponse<LabelResponseDto>(false, ex.Message));
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error updating label: {ex.Message}");
+            logger.LogError(ex,"Error updating label: {ExMessage}", ex.Message);
             return StatusCode(500, new ApiResponse<LabelResponseDto>(false, "An error occurred while updating Label"));
         }
     }
@@ -118,7 +118,7 @@ public class LabelController(ILabelService labelService, ILogger<LabelController
     /// <summary>
     /// Delete a Label
     /// </summary>
-    [HttpDelete("{labelId}")]
+    [HttpDelete("{labelId:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> DeleteLabelAsync(int labelId)
@@ -131,11 +131,12 @@ public class LabelController(ILabelService labelService, ILogger<LabelController
         }
         catch (KeyNotFoundException ex)
         {
+            logger.LogError(ex,"Label not found: {ExMessage}", ex.Message);
             return NotFound(new ApiResponse<string>(false, ex.Message));
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error deleting label: {ex.Message}");
+            logger.LogError(ex,"Error deleting label: {ExMessage}", ex.Message);
             return StatusCode(500, new ApiResponse<string>(false, "An error occurred while deleting Label"));
         }
     }
