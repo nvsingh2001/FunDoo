@@ -30,6 +30,9 @@ FunDoo is a feature-rich, distributed note-taking application built with **ASP.N
 *   **Async Messaging:** Uses **RabbitMQ** with **MassTransit** to handle:
     *   Email dispatching.
     *   Asynchronous reminder processing.
+*   **Logging:** Robust, structured logging using **NLog**.
+    *   Configured for both console and rolling file targets (`logs/nlog-all-*.log`, `logs/nlog-own-*.log`).
+    *   Integrated into Controllers for detailed error tracking and exception logging (e.g., `KeyNotFoundException`).
 
 ## 🏗️ Architecture
 
@@ -61,7 +64,7 @@ The solution follows a Clean Architecture approach separated into four distinct 
 *   **Message Broker:** RabbitMQ (MassTransit)
 *   **Caching:** Redis
 *   **Authentication:** JWT (RS256)
-*   **Logging:** Microsoft.Extensions.Logging
+*   **Logging:** NLog
 
 ## 📋 Prerequisites
 
